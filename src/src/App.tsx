@@ -4,6 +4,8 @@ import katex from 'katex'
 import 'katex/dist/katex.min.css'
 import './App.css'
 import BlochSphere from './BlochSphere'
+import { createQubitState, degreesToRadians } from './quantum'
+
 
 const presets = [
   { name: '|0⟩', theta: 0, phi: 0 },
@@ -33,25 +35,15 @@ export default function App() {
   const [theta, setTheta] = useState(90)
   const [phi, setPhi] = useState(0)
 
-  const state = useMemo(() => {
-    const t = theta * Math.PI / 180
-    const p = phi * Math.PI / 180
+  
+const state = useMemo(
+  () => createQubitState(
+    degreesToRadians(theta),
+    degreesToRadians(phi),
+  ),
+  [theta, phi],
+)
 
-    const alpha = Math.cos(t / 2)
-    const betaRe = Math.sin(t / 2) * Math.cos(p)
-    const betaIm = Math.sin(t / 2) * Math.sin(p)
-
-    return {
-      x: Math.sin(t) * Math.cos(p),
-      y: Math.sin(t) * Math.sin(p),
-      z: Math.cos(t),
-      alpha,
-      betaRe,
-      betaIm,
-      p0: alpha * alpha,
-      p1: betaRe * betaRe + betaIm * betaIm,
-    }
-  }, [theta, phi])
 
   const setPreset = (preset: typeof presets[number]) => {
     setTheta(preset.theta)
@@ -91,9 +83,9 @@ export default function App() {
           <BlochSphere theta={theta} phi={phi} />
 
           <div className="coordinate-strip">
-            <div><span>X COMPONENT</span><strong>{state.x.toFixed(4)}</strong></div>
-            <div><span>Y COMPONENT</span><strong>{state.y.toFixed(4)}</strong></div>
-            <div><span>Z COMPONENT</span><strong>{state.z.toFixed(4)}</strong></div>
+            <div><span>X COMPONENT</span><strong>{state.bloch.x.toFixed(4)}</strong></div>
+            <div><span>Y COMPONENT</span><strong>{state.bloch.y.toFixed(4)}</strong></div>
+            <div><span>Z COMPONENT</span><strong>{state.bloch.z.toFixed(4)}</strong></div>
           </div>
         </article>
 
@@ -182,10 +174,10 @@ export default function App() {
           <div className="math-block">
             <p className="field-title">COMPLEX AMPLITUDES</p>
             <div className="formula" dangerouslySetInnerHTML={equation(
-              String.raw`\alpha=\cos\frac{\theta}{2}=${state.alpha.toFixed(4)}`
+              String.raw`\alpha=\cos\frac{\theta}{2}=${state.alpha.re.toFixed(4)}`
             )} />
             <div className="formula" dangerouslySetInnerHTML={equation(
-              String.raw`\beta=${complexText(state.betaRe, state.betaIm)}`
+              String.raw`\beta=${complexText(state.beta.re, state.beta.im)}`
             )} />
             <p className="math-caption">β contains the relative phase φ.</p>
           </div>
@@ -196,7 +188,7 @@ export default function App() {
               String.raw`\vec r=(\sin\theta\cos\phi,\sin\theta\sin\phi,\cos\theta)`
             )} />
             <div className="formula" dangerouslySetInnerHTML={equation(
-              String.raw`\vec r=(${state.x.toFixed(3)},${state.y.toFixed(3)},${state.z.toFixed(3)})`
+              String.raw`\vec r=(${state.bloch.x.toFixed(3)},${state.bloch.y.toFixed(3)},${state.bloch.z.toFixed(3)})`
             )} />
           </div>
 
@@ -204,15 +196,15 @@ export default function App() {
             <p className="field-title">Z-BASIS MEASUREMENT</p>
             <div className="probability-row">
               <span>P(0) = |α|²</span>
-              <strong>{(state.p0 * 100).toFixed(2)}%</strong>
+              <strong>{(state.probabilities.zero * 100).toFixed(2)}%</strong>
             </div>
-            <div className="probability-track"><span style={{ width: `${state.p0 * 100}%` }} /></div>
+            <div className="probability-track"><span style={{ width: `${state.probabilities.zero * 100}%` }} /></div>
             <div className="probability-row">
               <span>P(1) = |β|²</span>
-              <strong>{(state.p1 * 100).toFixed(2)}%</strong>
+              <strong>{(state.probabilities.one * 100).toFixed(2)}%</strong>
             </div>
-            <div className="probability-track"><span style={{ width: `${state.p1 * 100}%` }} /></div>
-            <p className="math-caption">Normalization: P(0) + P(1) = {(state.p0 + state.p1).toFixed(4)}</p>
+            <div className="probability-track"><span style={{ width: `${state.probabilities.one * 100}%` }} /></div>
+            <p className="math-caption">Normalization: P(0) + P(1) = {(state.probabilities.zero + state.probabilities.one).toFixed(4)}</p>
           </div>
         </div>
       </section>
