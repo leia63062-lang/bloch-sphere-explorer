@@ -1,5 +1,5 @@
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import katex from 'katex'
 import 'katex/dist/katex.min.css'
 import './App.css'
@@ -48,6 +48,36 @@ const state = useMemo(
   [theta, phi],
 )
 
+  const [shots, setShots] = useState(100)
+  const [measurement, setMeasurement] = useState<{
+    zeros: number
+    ones: number
+    total: number
+    p0: number
+    p1: number
+  } | null>(null)
+
+  // Old results no longer apply after the state changes.
+  useEffect(() => {
+    setMeasurement(null)
+  }, [theta, phi])
+
+  const runMeasurement = () => {
+    const p0 = state.probabilities.zero
+    let zeros = 0
+
+    for (let i = 0; i < shots; i++) {
+      if (Math.random() < p0) zeros++
+    }
+
+    setMeasurement({
+      zeros,
+      ones: shots - zeros,
+      total: shots,
+      p0,
+      p1: state.probabilities.one,
+    })
+  }
 
   const setPreset = (preset: typeof presets[number]) => {
     setTheta(preset.theta)
@@ -291,6 +321,92 @@ const state = useMemo(
             <small>Probability of outcome 1</small>
           </div>
         </div>
+      </section>
+
+      <section className="card measurement-card">
+        <div className="card-heading">
+          <div>
+            <span className="section-index">05 / EXPERIMENT</span>
+            <h3>Measurement laboratory</h3>
+          </div>
+          <span className="tag">Z BASIS</span>
+        </div>
+
+        <p className="math-caption">
+          Measure repeated copies of the current state in the computational
+          basis. Results fluctuate randomly around the theoretical probabilities.
+        </p>
+
+        <div className="slider-heading">
+          <label htmlFor="shots">Number of shots</label>
+          <output>{shots.toLocaleString()}</output>
+        </div>
+
+        <div className="shot-options">
+          {[10, 100, 1000].map(n => (
+            <button
+              key={n}
+              className={shots === n ? 'preset active' : 'preset'}
+              onClick={() => setShots(n)}
+            >
+              {n.toLocaleString()}
+            </button>
+          ))}
+        </div>
+
+        <button className="reset-button" onClick={runMeasurement}>
+          ▶ Run measurement
+        </button>
+
+        {measurement && (
+          <div className="measurement-results">
+            <div className="probability-row">
+              <span>Outcome 0 · {measurement.zeros} counts</span>
+              <strong>
+                {(measurement.zeros / measurement.total * 100).toFixed(2)}%
+              </strong>
+            </div>
+            <div className="probability-track">
+              <span
+                style={{
+                  width: `${measurement.zeros / measurement.total * 100}%`,
+                }}
+              />
+            </div>
+
+            <div className="probability-row">
+              <span>Outcome 1 · {measurement.ones} counts</span>
+              <strong>
+                {(measurement.ones / measurement.total * 100).toFixed(2)}%
+              </strong>
+            </div>
+            <div className="probability-track">
+              <span
+                style={{
+                  width: `${measurement.ones / measurement.total * 100}%`,
+                }}
+              />
+            </div>
+
+            <div className="density-properties">
+              <div>
+                <span>THEORETICAL P(0)</span>
+                <strong>{(measurement.p0 * 100).toFixed(2)}%</strong>
+                <small>Predicted probability</small>
+              </div>
+              <div>
+                <span>THEORETICAL P(1)</span>
+                <strong>{(measurement.p1 * 100).toFixed(2)}%</strong>
+                <small>Predicted probability</small>
+              </div>
+              <div>
+                <span>TOTAL SHOTS</span>
+                <strong>{measurement.total.toLocaleString()}</strong>
+                <small>Completed trials</small>
+              </div>
+            </div>
+          </div>
+        )}
       </section>
 
       <footer>

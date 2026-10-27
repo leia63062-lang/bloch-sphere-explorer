@@ -312,3 +312,35 @@ footer { display: flex; justify-content: space-between; gap: 18px; padding: 28px
     gap: 8px;
   }
 }
+
+.measurement-card {
+  margin-top: 22px;
+}
+
+.shot-options {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 12px 0 18px;
+}
+
+.measurement-card .reset-button {
+  width: 100%;
+}
+
+.measurement-results {
+  margin-top: 24px;
+}
+
+.measurement-results .probability-row {
+  margin-top: 18px;
+}
+
+.measurement-results .probability-track {
+  overflow: hidden;
+}
+
+.measurement-results .probability-track span {
+  transition: width 180ms ease;
+}
+
