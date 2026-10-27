@@ -209,3 +209,106 @@ footer { display: flex; justify-content: space-between; gap: 18px; padding: 28px
   footer { flex-direction: column; }
   .tag { font-size: 7px; }
 }
+
+
+/* Density matrix inspector */
+.density-card {
+  margin-top: 22px;
+}
+
+.density-matrix {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  padding: 28px 12px;
+  color: #e7faff;
+  overflow-x: auto;
+}
+
+.matrix-symbol {
+  color: #5ee7ef;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.matrix-brackets {
+  position: relative;
+  padding: 12px 20px;
+}
+
+.matrix-brackets::before,
+.matrix-brackets::after {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 8px;
+  content: "";
+  border-color: #4adce7;
+  border-style: solid;
+}
+
+.matrix-brackets::before {
+  left: 0;
+  border-width: 1px 0 1px 2px;
+}
+
+.matrix-brackets::after {
+  right: 0;
+  border-width: 1px 2px 1px 0;
+}
+
+.matrix-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(90px, 1fr));
+  gap: 12px;
+  text-align: center;
+  padding: 9px 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.density-properties {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.density-properties > div {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding: 16px;
+  border: 1px solid rgba(94, 231, 239, 0.15);
+  border-radius: 12px;
+  background: rgba(94, 231, 239, 0.035);
+  min-width: 0;
+}
+
+.density-properties span {
+  color: #8caab7;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+}
+
+.density-properties strong {
+  color: #5ee7ef;
+  font-size: 1.25rem;
+  overflow-wrap: anywhere;
+}
+
+.density-properties small {
+  color: #8caab7;
+  line-height: 1.5;
+}
+
+@media (max-width: 600px) {
+  .density-properties {
+    grid-template-columns: 1fr;
+  }
+
+  .matrix-row {
+    grid-template-columns: repeat(2, minmax(72px, 1fr));
+    font-size: 0.85rem;
+    gap: 8px;
+  }
+}

@@ -4,7 +4,11 @@ import katex from 'katex'
 import 'katex/dist/katex.min.css'
 import './App.css'
 import BlochSphere from './BlochSphere'
-import { createQubitState, degreesToRadians } from './quantum'
+import {
+  applyGate,
+  createQubitState,
+  degreesToRadians,
+} from './quantum'
 
 
 const presets = [
@@ -48,6 +52,12 @@ const state = useMemo(
   const setPreset = (preset: typeof presets[number]) => {
     setTheta(preset.theta)
     setPhi(preset.phi)
+  }
+
+  const applyQuantumGate = (gate: 'X' | 'Y' | 'H') => {
+    const result = applyGate(state, gate)
+    setTheta(result.theta * 180 / Math.PI)
+    setPhi(result.phi * 180 / Math.PI)
   }
 
   return (
@@ -113,6 +123,32 @@ const state = useMemo(
               </button>
             ))}
           </div>
+
+          <p className="field-title">QUANTUM GATES</p>
+          <div className="preset-grid">
+            <button
+              className="preset"
+              onClick={() => applyQuantumGate('X')}
+            >
+              X · NOT
+            </button>
+            <button
+              className="preset"
+              onClick={() => applyQuantumGate('Y')}
+            >
+              Y · PAULI
+            </button>
+            <button
+              className="preset"
+              onClick={() => applyQuantumGate('H')}
+            >
+              H · HADAMARD
+            </button>
+          </div>
+          <p className="math-caption">
+            Gates transform the current state. Apply them repeatedly
+            to explore their effects.
+          </p>
 
           <div className="slider-heading">
             <label htmlFor="theta">Polar angle <i>θ</i></label>
@@ -205,6 +241,54 @@ const state = useMemo(
             </div>
             <div className="probability-track"><span style={{ width: `${state.probabilities.one * 100}%` }} /></div>
             <p className="math-caption">Normalization: P(0) + P(1) = {(state.probabilities.zero + state.probabilities.one).toFixed(4)}</p>
+          </div>
+        </div>
+      </section>
+
+
+      <section className="card density-card">
+        <div className="card-heading">
+          <div>
+            <span className="section-index">04 / STATE INSPECTOR</span>
+            <h3>Density matrix</h3>
+          </div>
+          <span className="tag">ρ = |ψ⟩⟨ψ|</span>
+        </div>
+
+        <p className="math-caption">
+          The density matrix describes the current pure quantum state.
+          Its diagonal entries are measurement probabilities.
+        </p>
+
+        <div className="density-matrix">
+          <span className="matrix-symbol">ρ =</span>
+          <div className="matrix-brackets">
+            <div className="matrix-row">
+              <span>{complexText(state.densityMatrix[0][0].re, state.densityMatrix[0][0].im)}</span>
+              <span>{complexText(state.densityMatrix[0][1].re, state.densityMatrix[0][1].im)}</span>
+            </div>
+            <div className="matrix-row">
+              <span>{complexText(state.densityMatrix[1][0].re, state.densityMatrix[1][0].im)}</span>
+              <span>{complexText(state.densityMatrix[1][1].re, state.densityMatrix[1][1].im)}</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="density-properties">
+          <div>
+            <span>TRACE</span>
+            <strong>{state.norm.toFixed(4)}</strong>
+            <small>Expected: 1</small>
+          </div>
+          <div>
+            <span>POPULATION |0⟩</span>
+            <strong>{state.densityMatrix[0][0].re.toFixed(4)}</strong>
+            <small>Probability of outcome 0</small>
+          </div>
+          <div>
+            <span>POPULATION |1⟩</span>
+            <strong>{state.densityMatrix[1][1].re.toFixed(4)}</strong>
+            <small>Probability of outcome 1</small>
           </div>
         </div>
       </section>

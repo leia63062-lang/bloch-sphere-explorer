@@ -148,3 +148,56 @@ export function formatComplex(
 
   return `${re.toFixed(digits)} ${im < 0 ? '−' : '+'} ${Math.abs(im).toFixed(digits)}i`
 }
+
+
+export type QuantumGate = 'X' | 'Y' | 'H'
+
+/**
+ * Apply a single-qubit gate and return the resulting
+ * Bloch-sphere angles in radians.
+ */
+export function applyGate(
+  state: QubitState,
+  gate: QuantumGate,
+): { theta: number; phi: number } {
+  const { alpha, beta } = state
+  let nextAlpha: Complex
+  let nextBeta: Complex
+
+  if (gate === 'X') {
+    // Pauli-X: exchange the amplitudes.
+    nextAlpha = beta
+    nextBeta = alpha
+  } else if (gate === 'Y') {
+    // Pauli-Y: [[0, -i], [i, 0]]
+    nextAlpha = { re: beta.im, im: -beta.re }
+    nextBeta = { re: -alpha.im, im: alpha.re }
+  } else {
+    // Hadamard: [[1, 1], [1, -1]] / sqrt(2)
+    const s = 1 / Math.sqrt(2)
+    nextAlpha = {
+      re: (alpha.re + beta.re) * s,
+      im: (alpha.im + beta.im) * s,
+    }
+    nextBeta = {
+      re: (alpha.re - beta.re) * s,
+      im: (alpha.im - beta.im) * s,
+    }
+  }
+
+  // Recover the Bloch vector from the resulting amplitudes.
+  const coherence = multiplyComplex(
+    conjugate(nextAlpha),
+    nextBeta,
+  )
+
+  const x = 2 * coherence.re
+  const y = 2 * coherence.im
+  const z =
+    magnitudeSquared(nextAlpha) - magnitudeSquared(nextBeta)
+
+  const theta = Math.acos(Math.max(-1, Math.min(1, z)))
+  const phi = Math.atan2(y, x)
+
+  return { theta, phi: wrapAngle(phi) }
+}
