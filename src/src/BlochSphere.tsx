@@ -157,6 +157,17 @@ export default function BlochSphere({ theta, phi }: Props) {
     const vectorGeometry = new THREE.BufferGeometry()
     const vector = new THREE.Line(vectorGeometry, vectorMaterial)
     scene.add(vector)
+const projectionMaterial = new THREE.LineDashedMaterial({
+  color: '#91a5b9',
+  dashSize: 0.09,
+  gapSize: 0.04,
+  transparent: true,
+  opacity: 1,
+})
+
+const projectionGeometry = new THREE.BufferGeometry()
+const projection = new THREE.Line(projectionGeometry, projectionMaterial)
+scene.add(projection)
 
     const tip = new THREE.Mesh(
       new THREE.SphereGeometry(0.045, 20, 16),
@@ -200,9 +211,22 @@ export default function BlochSphere({ theta, phi }: Props) {
         Math.cos(t),
         Math.sin(t) * Math.sin(p),
       )
+      
+      vectorGeometry.setFromPoints([
+        new THREE.Vector3(0, 0, 0),
+        end,
+      ])
 
-      vectorGeometry.setFromPoints([new THREE.Vector3(0, 0, 0), end])
+      projectionGeometry.setFromPoints([
+  end,
+  new THREE.Vector3(end.x, 0, end.z),
+])
+
+projection.computeLineDistances()
+projection.visible = Math.abs(end.y) > 0.05
+
       tip.position.copy(end)
+
 
       controls.update()
       renderer.render(scene, camera)
@@ -239,3 +263,4 @@ export default function BlochSphere({ theta, phi }: Props) {
     </div>
   )
 }
+
