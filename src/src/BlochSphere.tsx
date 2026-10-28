@@ -98,10 +98,58 @@ export default function BlochSphere({ theta, phi }: Props) {
     }
 
     // Cartesian axes
-    const axisMaterial = new THREE.LineBasicMaterial({ color: '#91a5b9' })
-    addLine([new THREE.Vector3(-1.3, 0, 0), new THREE.Vector3(1.3, 0, 0)], axisMaterial)
-    addLine([new THREE.Vector3(0, -1.3, 0), new THREE.Vector3(0, 1.3, 0)], axisMaterial)
-    addLine([new THREE.Vector3(0, 0, -1.3), new THREE.Vector3(0, 0, 1.3)], axisMaterial)
+    const axisMaterial = new THREE.LineBasicMaterial({
+      color: '#91a5b9',
+    })
+
+    addLine(
+      [new THREE.Vector3(-1.3, 0, 0), new THREE.Vector3(1.3, 0, 0)],
+      axisMaterial,
+    )
+    addLine(
+      [new THREE.Vector3(0, -1.3, 0), new THREE.Vector3(0, 1.3, 0)],
+      axisMaterial,
+    )
+    addLine(
+      [new THREE.Vector3(0, 0, -1.3), new THREE.Vector3(0, 0, 1.3)],
+      axisMaterial,
+    )
+
+    // Axis labels: Three.js Y is the vertical Bloch Z axis.
+    function addAxisLabel(
+      label: string,
+      position: THREE.Vector3,
+      color = '#d7e3ef',
+    ) {
+      const canvas = document.createElement('canvas')
+      canvas.width = 128
+      canvas.height = 64
+
+      const context = canvas.getContext('2d')
+      if (!context) return
+
+      context.clearRect(0, 0, canvas.width, canvas.height)
+      context.font = 'bold 40px Arial'
+      context.textAlign = 'center'
+      context.textBaseline = 'middle'
+      context.fillStyle = color
+      context.fillText(label, 64, 32)
+
+      const texture = new THREE.CanvasTexture(canvas)
+      const material = new THREE.SpriteMaterial({
+        map: texture,
+        transparent: true,
+        depthTest: false,
+      })
+      const sprite = new THREE.Sprite(material)
+      sprite.position.copy(position)
+      sprite.scale.set(0.35, 0.175, 1)
+      scene.add(sprite)
+    }
+
+    addAxisLabel('X', new THREE.Vector3(1.45, 0, 0))
+    addAxisLabel('Z', new THREE.Vector3(0, 1.45, 0), '#67d5e8')
+    addAxisLabel('Y', new THREE.Vector3(0, 0, 1.45))
 
     const vectorMaterial = new THREE.LineBasicMaterial({
       color: '#67d5e8',
