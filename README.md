@@ -4,6 +4,10 @@ An interactive 3D visualization tool for exploring single-qubit quantum states, 
 
 ![Bloch Sphere Explorer](image.of.bloch.sphere.png)
 
+## Live Demo 
+
+https://bloch-sphere-explorer-64r31ipzg-leia63062-9234.vercel.app/
+
 ## Overview
 
 The Bloch Sphere Explorer makes the mathematics of single-qubit quantum computing easier to explore through an interactive visual interface. Adjust a qubit's state, apply quantum gates, inspect its density matrix, and simulate measurements to see how quantum states behave.
