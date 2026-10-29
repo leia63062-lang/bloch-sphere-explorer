@@ -110,7 +110,7 @@ export function createQubitState(
   }
 
   
-const densityMatrix = [
+const densityMatrix: QubitState['densityMatrix'] = [
   [
     { re: magnitudeSquared(alpha), im: 0 },
     multiplyComplex(alpha, conjugate(beta)),
@@ -119,7 +119,7 @@ const densityMatrix = [
     multiplyComplex(beta, conjugate(alpha)),
     { re: magnitudeSquared(beta), im: 0 },
   ],
-] as const;
+];
 
   return {
     theta,
